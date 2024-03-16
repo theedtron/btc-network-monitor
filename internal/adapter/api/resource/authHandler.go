@@ -21,7 +21,7 @@ func (s *HTTPHandler) Register(c *gin.Context) {
 		return
 	}
 
-	resp, err := s.auth.Register(request)
+	resp, err := s.authService.Register(request)
 	if err != nil {
 		logger.Error("Error saving sprint" + err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -43,7 +43,7 @@ func (s *HTTPHandler) Login(c *gin.Context) {
 		return
 	}
 
-	resp, err := s.auth.Login(request)
+	resp, err := s.authService.Login(request)
 	if err != nil {
 		logger.Error("Error saving sprint" + err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
