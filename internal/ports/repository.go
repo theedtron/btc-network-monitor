@@ -1,6 +1,6 @@
 package ports
 
-type Reposiotry interface {
+type Repository interface {
 	Create(data interface{}) (interface{}, error)
 	Find(id string) (interface{}, error)
 	GetAll(param map[string]interface{}) (interface{}, error)

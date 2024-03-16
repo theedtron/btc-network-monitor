@@ -9,7 +9,7 @@ import (
 )
 
 type UserService struct {
-	repo ports.Reposiotry
+	repo ports.Repository
 }
 
 func NewUserService() *UserService {
