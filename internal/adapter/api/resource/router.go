@@ -7,7 +7,7 @@ import (
 )
 
 func (s *HTTPHandler) Routes(router *gin.Engine) {
-	router.Use(middleware.LoggingMiddleWare())
+	router.Use(middleware.CORS(), middleware.LoggingMiddleWare())
 	api := router.Group("/api/v1")
 
 	api.GET("/healthcheck", s.HealthCheck)
