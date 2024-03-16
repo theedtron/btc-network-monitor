@@ -36,9 +36,8 @@ func (s *UserService) Find(id string) (interface{}, error) {
 
 func (s *UserService) FindUserByEmail(param string) (*domain.User, error) {
 	users := []domain.User{}
-	data, err := s.GetAll(map[string]interface{}{"phone": param})
+	data, err := s.GetAll(map[string]interface{}{"email": param})
 	if err != nil {
-		data, err = s.GetAll(map[string]interface{}{"email": param})
 		if err != nil {
 			return nil, errors.New("error fetching users")
 		}
