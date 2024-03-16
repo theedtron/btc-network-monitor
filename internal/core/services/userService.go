@@ -35,7 +35,7 @@ func (s *UserService) Find(id string) (interface{}, error) {
 }
 
 func (s *UserService) FindUserByEmail(param string) (*domain.User, error) {
-	users := []domain.User{}
+	var users []domain.User
 	data, err := s.GetAll(map[string]interface{}{"email": param})
 	if err != nil {
 		if err != nil {
