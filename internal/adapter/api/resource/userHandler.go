@@ -16,7 +16,7 @@ func (s *HTTPHandler) GetAllUsers(c *gin.Context) {
 
 	resp, err := s.userService.GetAll(params)
 	if err != nil {
-		logger.Error("Error saving sprint" + err.Error())
+		logger.Error("Error getting data" + err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -40,7 +40,7 @@ func (s *HTTPHandler) UpdateUser(c *gin.Context) {
 
 	resp, err := s.userService.Update(params, request)
 	if err != nil {
-		logger.Error("Error saving sprint" + err.Error())
+		logger.Error("Error updating user" + err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -55,7 +55,7 @@ func (s *HTTPHandler) FindUser(c *gin.Context) {
 
 	resp, err := s.userService.Find(id)
 	if err != nil {
-		logger.Error("Error saving sprint" + err.Error())
+		logger.Error("Error finding user" + err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
