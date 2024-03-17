@@ -13,6 +13,7 @@ func (s *HTTPHandler) Routes(router *gin.Engine) {
 	api.GET("/healthcheck", s.HealthCheck)
 	api.POST("/register", s.Register)
 	api.POST("/login", s.Login)
+	api.GET("/info", s.GetBlockchainInfo)
 
 	//user routers
 	users := api.Group("/users")
