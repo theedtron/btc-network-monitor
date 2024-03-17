@@ -2,15 +2,14 @@ package logger
 
 import (
 	"fmt"
-	"os"
-	"path"
-
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
+	"os"
+	"path"
 )
 
 func init() {
-	fileName := path.Join("logs", "file-upload.log")
+	fileName := path.Join("logs", "btc-network-monitor.log")
 	// Create the log file if doesn't exist. And append to it if it already exists.
 	f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
 	Formatter := new(log.TextFormatter)
