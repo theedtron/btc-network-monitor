@@ -2,6 +2,7 @@ package main
 
 import (
 	adapter "btc-network-monitor/internal/adapter/api/resource"
+	"btc-network-monitor/internal/adapter/api/rpc"
 
 	"btc-network-monitor/internal/database"
 	"btc-network-monitor/internal/logger"
@@ -20,6 +21,7 @@ func main() {
 	}
 
 	database.ConnectDB()
+	rpc.NewRPCConfig()
 
 	router := gin.Default()
 	handler := adapter.NewHTTPHandler()
