@@ -5,24 +5,39 @@ import (
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"os"
-	"path"
+	"path/filepath"
 )
 
 func init() {
-	fileName := path.Join("logs", "btc-network-monitor.log")
-	// Create the log file if doesn't exist. And append to it if it already exists.
-	f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
-	Formatter := new(log.TextFormatter)
+	// Define the log file path
+	logFilePath := filepath.Join("logs", "btc-network-monitor.log")
 
-	Formatter.TimestampFormat = "02-01-2006 15:04:05"
-	Formatter.FullTimestamp = true
-	log.SetFormatter(Formatter)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		log.SetOutput(f)
+	// Check if the directory exists, if not, create it
+	dir := filepath.Dir(logFilePath)
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		err := os.MkdirAll(dir, 0755)
+		if err != nil {
+			fmt.Println("Error creating directory:", err)
+			return
+		}
 	}
 
+	// Create the log file if it doesn't exist. And append to it if it already exists.
+	f, err := os.OpenFile(logFilePath, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
+	if err != nil {
+		// Handle the error appropriately, for example, by logging to the standard output
+		fmt.Println("Error opening log file:", err)
+		return
+	}
+
+	// Set the formatter
+	Formatter := new(logrus.TextFormatter)
+	Formatter.TimestampFormat = "02-01-2006 15:04:05"
+	Formatter.FullTimestamp = true
+	logrus.SetFormatter(Formatter)
+
+	// Set the output to the file
+	logrus.SetOutput(f)
 }
 
 func Info(msg interface{}) {
