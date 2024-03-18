@@ -28,8 +28,6 @@ func NewRPCConfig() {
 		panic(err)
 	}
 
-	defer client.Shutdown()
-
 	Config = client
 
 }
