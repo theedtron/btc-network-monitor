@@ -3,7 +3,9 @@ package services
 import (
 	"btc-network-monitor/internal/adapter/api/rpc"
 	mysql_repo "btc-network-monitor/internal/adapter/repositories/mysql"
+	"btc-network-monitor/internal/logger"
 	"btc-network-monitor/internal/ports"
+	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/btcsuite/btcd/rpcclient"
 )
 
@@ -29,6 +31,26 @@ func (m *MonitorService) GetBlockChainInfo() (interface{}, error) {
 		"current_block_height": info.Blocks,
 		"difficulty":           info.Difficulty,
 		"network_hash_rate":    info.BestBlockHash,
+	}, nil
+
+}
+
+func (m *MonitorService) GetBlockByHash(str string) (interface{}, error) {
+	blockHash, err := chainhash.NewHashFromStr(str)
+	if err != nil {
+		logger.Error("Invalid block hash: " + err.Error())
+		return nil, err
+	}
+
+	block, err := m.client.GetBlockVerbose(blockHash)
+	if err != nil {
+		logger.Error("Error getting block : " + err.Error())
+
+		return nil, err
+	}
+
+	return map[string]interface{}{
+		"block": block,
 	}, nil
 
 }

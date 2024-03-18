@@ -14,6 +14,7 @@ func (s *HTTPHandler) Routes(router *gin.Engine) {
 	api.POST("/register", s.Register)
 	api.POST("/login", s.Login)
 	api.GET("/info", s.GetBlockchainInfo)
+	api.GET("/block/:block_hash", s.GetBlockByHash)
 
 	//user routers
 	users := api.Group("/users")
