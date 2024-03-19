@@ -3,7 +3,6 @@ package services
 import (
 	"btc-network-monitor/internal/adapter/api/rpc"
 	mysql_repo "btc-network-monitor/internal/adapter/repositories/mysql"
-	"btc-network-monitor/internal/logger"
 	"btc-network-monitor/internal/ports"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/btcsuite/btcd/rpcclient"
@@ -35,17 +34,9 @@ func (m *MonitorService) GetBlockChainInfo() (interface{}, error) {
 
 }
 
-func (m *MonitorService) GetBlockByHash(str string) (interface{}, error) {
-	blockHash, err := chainhash.NewHashFromStr(str)
+func (m *MonitorService) GetBlockByHash(hash *chainhash.Hash) (interface{}, error) {
+	block, err := m.client.GetBlockVerbose(hash)
 	if err != nil {
-		logger.Error("Invalid block hash: " + err.Error())
-		return nil, err
-	}
-
-	block, err := m.client.GetBlockVerbose(blockHash)
-	if err != nil {
-		logger.Error("Error getting block : " + err.Error())
-
 		return nil, err
 	}
 
@@ -71,16 +62,9 @@ func (m *MonitorService) GetBlockByHeight(height int64) (interface{}, error) {
 	}, nil
 }
 
-func (m *MonitorService) GetTransactionByTransactionID(id string) (interface{}, error) {
-	txHash, err := chainhash.NewHashFromStr(id)
+func (m *MonitorService) GetTransactionByTransactionID(hash *chainhash.Hash) (interface{}, error) {
+	tx, err := m.client.GetRawTransactionVerbose(hash)
 	if err != nil {
-		logger.Error("Invalid transaction ID:" + err.Error())
-		return nil, err
-	}
-
-	tx, err := m.client.GetRawTransactionVerbose(txHash)
-	if err != nil {
-		logger.Error("Error getting transaction: " + err.Error())
 		return nil, err
 	}
 
@@ -93,7 +77,6 @@ func (m *MonitorService) GetTransactionByTransactionID(id string) (interface{}, 
 func (m *MonitorService) GetLatestTransactions() (interface{}, error) {
 	transactions, err := m.client.GetRawMempool()
 	if err != nil {
-		logger.Error("Error getting latest transactions: " + err.Error())
 		return nil, err
 	}
 
@@ -109,7 +92,7 @@ func (m *MonitorService) GetLatestBlocks() (interface{}, error) {
 	}
 
 	var blockHashes []string
-	for i := 0; i < 10; i++ { // Assuming we want the latest 10 blocks
+	for i := 0; i < 10; i++ {
 		blockHash, err := m.client.GetBlockHash(int64(chainInfo.Blocks - int32(i)))
 		if err != nil {
 			return nil, err
@@ -119,6 +102,17 @@ func (m *MonitorService) GetLatestBlocks() (interface{}, error) {
 
 	return map[string]interface{}{
 		"blocks": blockHashes,
+	}, nil
+
+}
+
+func (m *MonitorService) GetAddressInfo(address string) (interface{}, error) {
+	info, err := m.client.GetAddressInfo(address)
+	if err != nil {
+		return nil, err
+	}
+	return map[string]interface{}{
+		"info": info,
 	}, nil
 
 }
