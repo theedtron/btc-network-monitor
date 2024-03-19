@@ -65,3 +65,16 @@ func (s *HTTPHandler) GetTransaction(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, tx)
 }
+
+func (s *HTTPHandler) GetLatestTransactions(c *gin.Context) {
+	logger.Info("get latest transactions")
+
+	transactions, err := s.monitorService.GetLatestTransactions()
+	if err != nil {
+		logger.Error("Error getting latest transactions: " + err.Error())
+		c.JSON(400, gin.H{"Error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, transactions)
+}

@@ -78,7 +78,6 @@ func (m *MonitorService) GetTransactionByTransactionID(id string) (interface{}, 
 		return nil, err
 	}
 
-	// Get transaction details by transaction ID
 	tx, err := m.client.GetRawTransactionVerbose(txHash)
 	if err != nil {
 		logger.Error("Error getting transaction: " + err.Error())
@@ -89,4 +88,16 @@ func (m *MonitorService) GetTransactionByTransactionID(id string) (interface{}, 
 		"transaction": tx,
 	}, nil
 
+}
+
+func (m *MonitorService) GetLatestTransactions() (interface{}, error) {
+	transactions, err := m.client.GetRawMempool()
+	if err != nil {
+		logger.Error("Error getting latest transactions: " + err.Error())
+		return nil, err
+	}
+
+	return map[string]interface{}{
+		"transactions": transactions,
+	}, nil
 }
