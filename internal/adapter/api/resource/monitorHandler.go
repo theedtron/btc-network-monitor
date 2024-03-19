@@ -78,3 +78,16 @@ func (s *HTTPHandler) GetLatestTransactions(c *gin.Context) {
 
 	c.JSON(http.StatusOK, transactions)
 }
+
+func (s *HTTPHandler) GetLatestBlocks(c *gin.Context) {
+	logger.Info("get latest blocks")
+
+	blocks, err := s.monitorService.GetLatestBlocks()
+	if err != nil {
+		logger.Error("Error getting latest blocks: " + err.Error())
+		c.JSON(400, gin.H{"Error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, blocks)
+}

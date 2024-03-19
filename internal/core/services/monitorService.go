@@ -101,3 +101,24 @@ func (m *MonitorService) GetLatestTransactions() (interface{}, error) {
 		"transactions": transactions,
 	}, nil
 }
+
+func (m *MonitorService) GetLatestBlocks() (interface{}, error) {
+	chainInfo, err := m.client.GetBlockChainInfo()
+	if err != nil {
+		return nil, err
+	}
+
+	var blockHashes []string
+	for i := 0; i < 10; i++ { // Assuming we want the latest 10 blocks
+		blockHash, err := m.client.GetBlockHash(int64(chainInfo.Blocks - int32(i)))
+		if err != nil {
+			return nil, err
+		}
+		blockHashes = append(blockHashes, blockHash.String())
+	}
+
+	return map[string]interface{}{
+		"blocks": blockHashes,
+	}, nil
+
+}
