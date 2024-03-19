@@ -91,17 +91,24 @@ func (m *MonitorService) GetLatestBlocks() (interface{}, error) {
 		return nil, err
 	}
 
-	var blockHashes []string
+	var blocks []interface{}
 	for i := 0; i < 10; i++ {
 		blockHash, err := m.client.GetBlockHash(int64(chainInfo.Blocks - int32(i)))
 		if err != nil {
 			return nil, err
 		}
-		blockHashes = append(blockHashes, blockHash.String())
+
+		block, err := m.client.GetBlockVerbose(blockHash)
+		if err != nil {
+			return nil, err
+		}
+
+		blocks = append(blocks, block)
+
 	}
 
 	return map[string]interface{}{
-		"blocks": blockHashes,
+		"blocks": blocks,
 	}, nil
 
 }
