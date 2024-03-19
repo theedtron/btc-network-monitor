@@ -54,3 +54,19 @@ func (m *MonitorService) GetBlockByHash(str string) (interface{}, error) {
 	}, nil
 
 }
+
+func (m *MonitorService) GetBlockByHeight(height int64) (interface{}, error) {
+	blockHash, err := m.client.GetBlockHash(height)
+	if err != nil {
+		return nil, err
+	}
+
+	block, err := m.client.GetBlockVerbose(blockHash)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{
+		"block": block,
+	}, nil
+}
