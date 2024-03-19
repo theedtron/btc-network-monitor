@@ -70,3 +70,23 @@ func (m *MonitorService) GetBlockByHeight(height int64) (interface{}, error) {
 		"block": block,
 	}, nil
 }
+
+func (m *MonitorService) GetTransactionByTransactionID(id string) (interface{}, error) {
+	txHash, err := chainhash.NewHashFromStr(id)
+	if err != nil {
+		logger.Error("Invalid transaction ID:" + err.Error())
+		return nil, err
+	}
+
+	// Get transaction details by transaction ID
+	tx, err := m.client.GetRawTransactionVerbose(txHash)
+	if err != nil {
+		logger.Error("Error getting transaction: " + err.Error())
+		return nil, err
+	}
+
+	return map[string]interface{}{
+		"transaction": tx,
+	}, nil
+
+}
