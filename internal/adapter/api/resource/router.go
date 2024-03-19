@@ -17,6 +17,7 @@ func (s *HTTPHandler) Routes(router *gin.Engine) {
 	api.GET("/block/:block_hash", s.GetBlockByHash)
 	api.GET("/block/height/:param", s.GetBlockByHeight)
 	api.GET("/transaction/:tx_id", s.GetTransaction)
+	api.GET("/transactions/latest", s.GetLatestTransactions)
 
 	//user routers
 	users := api.Group("/users")
