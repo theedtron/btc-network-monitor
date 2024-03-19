@@ -52,3 +52,16 @@ func (s *HTTPHandler) GetBlockByHeight(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, block)
 }
+
+func (s *HTTPHandler) GetTransaction(c *gin.Context) {
+	logger.Info("get block by transaction id")
+
+	txID := c.Param("tx_id")
+	tx, err := s.monitorService.GetTransactionByTransactionID(txID)
+	if err != nil {
+		logger.Error("Error getting block by transaction id: " + err.Error())
+		c.JSON(400, gin.H{"Error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, tx)
+}
