@@ -75,9 +75,24 @@ func (m *MonitorService) GetTransactionByTransactionID(hash *chainhash.Hash) (in
 }
 
 func (m *MonitorService) GetLatestTransactions() (interface{}, error) {
-	transactions, err := m.client.GetRawMempool()
+	transactionHash, err := m.client.GetRawMempool()
 	if err != nil {
 		return nil, err
+	}
+
+	var transactions []interface{}
+	for _, hash := range transactionHash {
+		tx, err := m.client.GetRawTransactionVerbose(hash)
+		if err != nil {
+			return nil, err
+		}
+		transactions = append(transactions, tx)
+	}
+
+	if len(transactions) == 0 {
+		return map[string]interface{}{
+			"transactions": []interface{}{},
+		}, nil
 	}
 
 	return map[string]interface{}{
