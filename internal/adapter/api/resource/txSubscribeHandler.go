@@ -5,6 +5,7 @@ import (
 	"btc-network-monitor/internal/adapter/api/response"
 	"btc-network-monitor/internal/core/domain"
 	"btc-network-monitor/internal/logger"
+	"btc-network-monitor/internal/mailer"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -84,4 +85,18 @@ func (s *HTTPHandler) FindTxSubscribe(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, response.NewTxSubscribeResponse(resp, err))
+}
+
+func (s *HTTPHandler) TestMail(c *gin.Context) {
+	//send email
+	senderEmailData := mailer.EmailData{
+		FirstName: "Theed",
+		Subject: "BTM Transaction Confirmation",
+		MailTo: "kareoedwin@gmail.com",
+		Confirmations: 11,
+		TxId: "33adb5e349125eb07b74d2ef70a658e0bc3ca7bad7337600f91592d166559197",
+	}
+	mailer.SendEmail(&senderEmailData)
+
+	c.JSON(http.StatusOK, "ok")
 }

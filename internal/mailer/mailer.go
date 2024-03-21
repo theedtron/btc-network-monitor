@@ -1,13 +1,13 @@
 package mailer
 
 import (
+	"btc-network-monitor/internal/logger"
 	"bytes"
 	"crypto/tls"
 	"html/template"
-	"log"
-	"strconv"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/k3a/html2text"
 	"gopkg.in/gomail.v2"
@@ -27,6 +27,7 @@ func ParseTemplateDir(dir string) (*template.Template, error) {
 	var paths []string
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
+			logger.Error("Could not parse template" + err.Error())
 			return err
 		}
 		if !info.IsDir() {
@@ -36,6 +37,7 @@ func ParseTemplateDir(dir string) (*template.Template, error) {
 	})
 
 	if err != nil {
+		logger.Error("Could not parse template" + err.Error())
 		return nil, err
 	}
 
@@ -54,16 +56,16 @@ func SendEmail(data *EmailData) error {
 	smtpPort, err := strconv.Atoi(portString)
 	if err != nil {
         // ... handle error
-        log.Fatal("Could not covert port string", err)
+		logger.Error("Could not covert port string" + err.Error())
     }
 
 	var body bytes.Buffer
 	template, err := ParseTemplateDir("internal/views/templates")
 	if err != nil {
-		log.Fatal("Could not parse template", err)
+		logger.Error("Could not parse template" + err.Error())
 	}
 
-	template.ExecuteTemplate(&body, "verificationCode.html", &data)
+	template.ExecuteTemplate(&body, "notification.html", &data)
 
 	m := gomail.NewMessage()
 
@@ -75,9 +77,11 @@ func SendEmail(data *EmailData) error {
 
 	d := gomail.NewDialer(smtpHost, smtpPort, smtpUser, smtpPass)
 	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+	logger.Info(d)
 
 	// Send Email
 	if err := d.DialAndSend(m); err != nil {
+		logger.Error("Could not send mail" + err.Error())
 		return err
 	}
 	return nil
