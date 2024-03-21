@@ -14,11 +14,11 @@ import (
 )
 
 type EmailData struct {
-	URL string
 	FirstName string
 	Subject string
 	MailTo string
 	Confirmations int64
+	TxId string
 }
 
 
