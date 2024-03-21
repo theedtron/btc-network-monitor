@@ -7,7 +7,7 @@
         <tr>
           <td>
             <p>Hi {{ .FirstName}},</p>
-            <p>Please verify your account to be able to login</p>
+            <p>Your transaction {{ .TxId}} has now reached {{ .Confirmations}} confirmations</p>
             <table
               role="presentation"
               border="0"
@@ -27,9 +27,7 @@
                       <tbody>
                         <tr>
                           <td>
-                            <a href="{{.URL}}" target="_blank"
-                              >Verify your account</a
-                            >
+                            Thank you for using this service.
                           </td>
                         </tr>
                       </tbody>
@@ -38,7 +36,7 @@
                 </tr>
               </tbody>
             </table>
-            <p>Good luck! Codevo CEO.</p>
+            <p>Remain Awesome.</p>
           </td>
         </tr>
       </table>
