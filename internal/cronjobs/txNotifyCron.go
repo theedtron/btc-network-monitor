@@ -14,14 +14,23 @@ import (
 
 
 func TxNotify (){
+	logger.Info("Starting Tx Notify Check")
 	
+	db := database.ConnectDB()
+
 	//Query txsubscribers
 	repo := mysql_repo.TxSubscribeRepository{}
 	txModel := repo.ArrayModel()
-	db := database.ConnectDB()
-	qTx := db.Preload(clause.Associations)
-	qTx.Where("status = ?", 0)
-	qTx.Find(&txModel)
+	qtx := db.Preload(clause.Associations)
+	qtx.Where("status = ?", 0)
+	qtx.Find(&txModel)
+
+	logger.Info(txModel)
+
+	if len(txModel) < 1 {
+		logger.Error("No records found")
+		return
+	}
 
 	client := rpc.Config
 
@@ -44,12 +53,20 @@ func TxNotify (){
 		}
 
 		if getTx.Confirmations >= confirms {
+			logger.Info("Preparing to send Email. Target met")
 			userRepo := mysql_repo.UserRepository{}
 			userModel := userRepo.Model()
-			db := database.ConnectDB()
 			qUser := db.Preload(clause.Associations)
 			qUser.Where("id = ?", sub.UserID)
 			qUser.First(&userModel)
+
+			txModelFind := repo.Model()
+			qTxFind := db.Preload(clause.Associations)
+			qTxFind.Where("id = ?", sub.ID)
+			qTxFind.First(&txModelFind)
+			
+			txModelFind.Status = true
+			qTxFind.Save(txModelFind)
 
 			//send email
 			senderEmailData := mailer.EmailData{
