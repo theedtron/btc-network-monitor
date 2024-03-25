@@ -30,5 +30,16 @@ func (s *HTTPHandler) Routes(router *gin.Engine) {
 		users.GET("/:id", s.FindUser)
 	}
 
+	//user routers
+	txSubscribers := api.Group("/txsubscribe")
+	{
+		txSubscribers.Use(middleware.AuthMiddleware())
+		txSubscribers.GET("/", s.GetAllTxSubscribe)
+		txSubscribers.PUT("/:id", s.UpdateTxSubscribe)
+		txSubscribers.GET("/:id", s.FindTxSubscribe)
+		txSubscribers.POST("/create", s.CreateTxSubscribe)
+		txSubscribers.GET("/testmail", s.TestMail)
+	}
+
 	router.NoRoute(func(c *gin.Context) { c.String(404, "Not found") })
 }

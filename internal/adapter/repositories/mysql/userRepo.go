@@ -9,6 +9,11 @@ import (
 type UserRepository struct {
 }
 
+func (repo *UserRepository) GetFalseStatus() (interface{}, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func NewUserRepository() ports.Repository {
 	return &UserRepository{}
 }

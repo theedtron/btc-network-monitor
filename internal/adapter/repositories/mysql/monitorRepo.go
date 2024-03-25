@@ -1,8 +1,15 @@
 package mysql_repo
 
-import "btc-network-monitor/internal/ports"
+import (
+	"btc-network-monitor/internal/ports"
+)
 
 type MonitorRepository struct {
+}
+
+func (m MonitorRepository) GetFalseStatus() (interface{}, error) {
+	//TODO implement me
+	panic("implement me")
 }
 
 func NewMonitorRepository() ports.Repository {
