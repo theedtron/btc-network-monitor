@@ -26,6 +26,19 @@ func (s *HTTPHandler) GetAllTxSubscribe(c *gin.Context) {
 	c.JSON(http.StatusOK, response.NewTxSubscribeArrayResponse(resp, err))
 }
 
+func (s *HTTPHandler) GetFalseStatusSubscribers(c *gin.Context) {
+	logger.Info("GetFalseStatusSubscribers")
+
+	resp, err := s.txSubscribeService.GetFalseStatus()
+	if err != nil {
+		logger.Error("Error getting data" + err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, response.NewTxSubscribeArrayResponse(resp, err))
+}
+
 func (s *HTTPHandler) CreateTxSubscribe(c *gin.Context) {
 	logger.Info("Update Target Confirms")
 
@@ -90,13 +103,15 @@ func (s *HTTPHandler) FindTxSubscribe(c *gin.Context) {
 func (s *HTTPHandler) TestMail(c *gin.Context) {
 	//send email
 	senderEmailData := mailer.EmailData{
-		FirstName: "Theed",
-		Subject: "BTM Transaction Confirmation",
-		MailTo: "kareoedwin@gmail.com",
+		FirstName:     "Theed",
+		Subject:       "BTM Transaction Confirmation",
+		MailTo:        "kareoedwin@gmail.com",
 		Confirmations: 11,
-		TxId: "33adb5e349125eb07b74d2ef70a658e0bc3ca7bad7337600f91592d166559197",
+		TxId:          "33adb5e349125eb07b74d2ef70a658e0bc3ca7bad7337600f91592d166559197",
 	}
-	mailer.SendEmail(&senderEmailData)
+
+	sender := mailer.NotificationConfig{}
+	sender.SendEmail(&senderEmailData)
 
 	c.JSON(http.StatusOK, "ok")
 }

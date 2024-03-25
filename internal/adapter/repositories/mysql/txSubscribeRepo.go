@@ -6,10 +6,20 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-type TxSubscribeRepository struct {}
+type TxSubscribeRepository struct{}
 
 func NewTxSubscribeRepository() ports.Repository {
 	return &TxSubscribeRepository{}
+}
+
+func (repo *TxSubscribeRepository) GetFalseStatus() (interface{}, error) {
+	model := repo.ArrayModel()
+
+	if err := db.Where("status = ?", false).Find(&model).Error; err != nil {
+		return nil, err
+	}
+	return model, nil
+
 }
 
 func (repo *TxSubscribeRepository) GetAll(param map[string]interface{}) (interface{}, error) {

@@ -19,9 +19,9 @@ func NewTxSubscribeService() *TxSubscribeService {
 
 func (s *TxSubscribeService) Save(input domain.TxSubscribe) (interface{}, error) {
 	txSub := domain.TxSubscribe{
-		TxID: input.TxID,
+		TxID:           input.TxID,
 		TargetConfirms: input.TargetConfirms,
-		UserID: input.UserID,
+		UserID:         input.UserID,
 	}
 	return s.repo.Create(&txSub)
 }
@@ -32,6 +32,10 @@ func (s *TxSubscribeService) Update(id string, input requests.UpdateTxSubscribeR
 
 func (s *TxSubscribeService) GetAll(param map[string]interface{}) (interface{}, error) {
 	return s.repo.GetAll(param)
+}
+
+func (s *TxSubscribeService) GetFalseStatus() (interface{}, error) {
+	return s.repo.GetFalseStatus()
 }
 
 func (s *TxSubscribeService) Find(id string) (interface{}, error) {
