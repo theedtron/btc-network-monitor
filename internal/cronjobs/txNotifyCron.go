@@ -3,44 +3,29 @@ package cronjobs
 import (
 	"btc-network-monitor/internal/adapter/api/rpc"
 	mysql_repo "btc-network-monitor/internal/adapter/repositories/mysql"
-	"btc-network-monitor/internal/database"
+	"btc-network-monitor/internal/core/domain"
 	"btc-network-monitor/internal/logger"
 	"btc-network-monitor/internal/mailer"
-	"strconv"
-
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
-	"gorm.io/gorm/clause"
+	"strconv"
 )
 
-
-func TxNotify (){
+func TxNotify(config mailer.NotificationConfig) {
 	logger.Info("Starting Tx Notify Check")
-	
-	db := database.ConnectDB()
 
-	//Query txsubscribers
-	repo := mysql_repo.TxSubscribeRepository{}
-	txModel := repo.ArrayModel()
-	qtx := db.Preload(clause.Associations)
-	qtx.Where("status = ?", 0)
-	qtx.Find(&txModel)
+	statusArray, _ := mysql_repo.NewTxSubscribeRepository().GetFalseStatus()
 
-	logger.Info(txModel)
-
-	if len(txModel) < 1 {
-		logger.Error("No records found")
-		return
-	}
+	subscribes := statusArray.([]domain.TxSubscribe)
 
 	client := rpc.Config
 
-	for _, sub := range txModel {
-		txId, err := chainhash.NewHashFromStr(sub.TxID)
+	for _, sub := range subscribes {
+		txHash, err := chainhash.NewHashFromStr(sub.TxID)
 		if err != nil {
-			logger.Error("Error convering chain hash data" + err.Error())
+			logger.Error("Error converting chain hash data" + err.Error())
 			return
 		}
-		getTx, err := client.GetTransaction(txId)
+		getTx, err := client.GetTransaction(txHash)
 		if err != nil {
 			logger.Error("Error getting bitcoin tx data" + err.Error())
 			return
@@ -48,36 +33,59 @@ func TxNotify (){
 
 		confirms, err := strconv.ParseInt(sub.TargetConfirms, 10, 64)
 		if err != nil {
-			logger.Error("Error convering string to int64" + err.Error())
+			logger.Error("Error converting string to int64" + err.Error())
 			return
 		}
 
 		if getTx.Confirmations >= confirms {
 			logger.Info("Preparing to send Email. Target met")
-			userRepo := mysql_repo.UserRepository{}
-			userModel := userRepo.Model()
-			qUser := db.Preload(clause.Associations)
-			qUser.Where("id = ?", sub.UserID)
-			qUser.First(&userModel)
 
-			txModelFind := repo.Model()
-			qTxFind := db.Preload(clause.Associations)
-			qTxFind.Where("id = ?", sub.ID)
-			qTxFind.First(&txModelFind)
-			
-			txModelFind.Status = true
-			qTxFind.Save(txModelFind)
+			userRepo := mysql_repo.UserRepository{}
+			user, _ := userRepo.Find(sub.UserID)
+			userModel, ok := user.(domain.User)
+			if !ok {
+				logger.Error("failed to type assert user")
+				return
+			}
+
+			subscriberRepo := mysql_repo.TxSubscribeRepository{}
+			subData, err := subscriberRepo.Find(sub.ID)
+			if err != nil {
+				return
+			}
+
+			subscribe, ok := subData.(domain.TxSubscribe)
+			if !ok {
+				logger.Error("failed to type assert subscribe")
+				return
+			}
+
+			originalData := subData
+			subscribe.Status = true
+
+			_, err = subscriberRepo.Update(sub.ID, subscribe)
+			if err != nil {
+				logger.Error("failed to update data: " + err.Error())
+				return
+			}
 
 			//send email
 			senderEmailData := mailer.EmailData{
-				FirstName: "Theed",
-				Subject: "BTM Transaction Confirmation",
-				MailTo: userModel.Email,
+				FirstName:     userModel.Firstname,
+				Subject:       "BTM Transaction Confirmation",
+				MailTo:        userModel.Email,
 				Confirmations: confirms,
-				TxId: sub.TxID,
+				TxId:          sub.TxID,
 			}
-			mailer.SendEmail(&senderEmailData)
+			err = config.SendEmail(&senderEmailData)
+			if err != nil {
+				_, rollbackErr := subscriberRepo.Update(sub.ID, originalData)
+				if rollbackErr != nil {
+					logger.Error("failed to update data: " + err.Error())
+				}
+				return
+			}
 		}
 	}
-	
+
 }

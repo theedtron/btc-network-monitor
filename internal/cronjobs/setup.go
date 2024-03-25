@@ -1,23 +1,27 @@
 package cronjobs
 
-import(
-	"time"
+import (
+	"btc-network-monitor/internal/logger"
+	"btc-network-monitor/internal/mailer"
 	"github.com/robfig/cron"
 )
 
-
-func InitCronJob() {
-	//Add cron job
+func InitCronJob(stop <-chan struct{}) {
 	c := cron.New()
-	// Define the Cron job schedule
-    c.AddFunc("15 * * * *", func() {
-        TxNotify()
-    })
-	// Start the Cron job scheduler
-    c.Start()
-	// Wait for the Cron job to run
-    time.Sleep(5 * time.Minute)
+	mailr := mailer.NotificationConfig{}
+	err := c.AddFunc("1 * * * *", func() {
+		logger.Info("Tx notify running...")
+		TxNotify(mailr)
+	})
+	if err != nil {
+		logger.Error("Failed to add cron job:" + err.Error())
+		return
+	}
+	c.Start()
+	logger.Info("Cron job started")
 
-    // Stop the Cron job scheduler
-    c.Stop()
+	<-stop
+
+	c.Stop()
+
 }
