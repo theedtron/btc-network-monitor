@@ -6,6 +6,7 @@ import (
 	"btc-network-monitor/internal/ports"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/btcsuite/btcd/rpcclient"
+	"math"
 )
 
 type MonitorService struct {
@@ -26,10 +27,19 @@ func (m *MonitorService) GetBlockChainInfo() (interface{}, error) {
 		return nil, err
 	}
 
+	blockCount, err := m.client.GetBlockCount()
+	if err != nil {
+		return nil, err
+	}
+
+	expectedBlocks := int64(144) // Expected number of blocks in 24 hours
+
+	networkHashRate := float64(blockCount/expectedBlocks) * info.Difficulty * math.Pow(2, 32) / 600
+
 	return map[string]interface{}{
 		"current_block_height": info.Blocks,
 		"difficulty":           info.Difficulty,
-		"network_hash_rate":    info.BestBlockHash,
+		"network_hash_rate":    networkHashRate,
 	}, nil
 
 }
