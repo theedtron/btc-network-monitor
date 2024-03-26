@@ -17,6 +17,11 @@ require (
 )
 
 require (
+	github.com/robfig/cron v1.2.0 // indirect
+	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
+)
+
+require (
 	github.com/btcsuite/btcd/btcec/v2 v2.1.3 // indirect
 	github.com/btcsuite/btcd/btcutil v1.1.5 // indirect
 	github.com/btcsuite/btclog v0.0.0-20170628155309-84c8d2346e9f // indirect
@@ -36,6 +41,7 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
+	github.com/k3a/html2text v1.2.1
 	github.com/klauspost/cpuid/v2 v2.2.4 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
@@ -49,5 +55,6 @@ require (
 	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/text v0.12.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
+	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
