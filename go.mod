@@ -9,6 +9,7 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
+	github.com/robfig/cron v1.2.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/subosito/gotenv v1.6.0
 	golang.org/x/crypto v0.9.0
@@ -16,10 +17,7 @@ require (
 	gorm.io/gorm v1.25.7
 )
 
-require (
-	github.com/robfig/cron v1.2.0 // indirect
-	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
-)
+require gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 
 require (
 	github.com/btcsuite/btcd/btcec/v2 v2.1.3 // indirect
