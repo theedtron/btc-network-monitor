@@ -41,12 +41,29 @@ func (s *HTTPHandler) GetFalseStatusSubscribers(c *gin.Context) {
 
 func (s *HTTPHandler) CreateTxSubscribe(c *gin.Context) {
 	logger.Info("Update Target Confirms")
+	user, authExist := c.Get("user")
+	if !authExist {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Authenticated user not detected",
+		})
+		return
+	}
+	userMap := user.(map[string]interface {})
 
-	request := domain.TxSubscribe{}
+	request := domain.TxSubscribe{UserID: userMap["id"].(string)}
 	err := c.ShouldBind(&request)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
+		})
+		return
+	}
+
+	//Check if exists
+	_, err = s.txSubscribeService.FindByTxId(request.TxID)
+	if err == nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Transaction already exists",
 		})
 		return
 	}
@@ -102,6 +119,7 @@ func (s *HTTPHandler) FindTxSubscribe(c *gin.Context) {
 
 func (s *HTTPHandler) TestMail(c *gin.Context) {
 	//send email
+	config := mailer.NewNotificationConfig()
 	senderEmailData := mailer.EmailData{
 		FirstName:     "Theed",
 		Subject:       "BTM Transaction Confirmation",
@@ -110,8 +128,7 @@ func (s *HTTPHandler) TestMail(c *gin.Context) {
 		TxId:          "33adb5e349125eb07b74d2ef70a658e0bc3ca7bad7337600f91592d166559197",
 	}
 
-	sender := mailer.NotificationConfig{}
-	sender.SendEmail(&senderEmailData)
+	config.SendEmail(&senderEmailData)
 
 	c.JSON(http.StatusOK, "ok")
 }
