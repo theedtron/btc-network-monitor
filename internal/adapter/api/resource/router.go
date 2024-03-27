@@ -24,16 +24,16 @@ func (s *HTTPHandler) Routes(router *gin.Engine) {
 	//user routers
 	users := api.Group("/users")
 	{
-		users.Use(middleware.AuthMiddleware())
+		users.Use(middleware.AuthMiddleware(), middleware.CORS())
 		users.GET("/", s.GetAllUsers)
 		users.PUT("/:id", s.UpdateUser)
 		users.GET("/:id", s.FindUser)
 	}
 
-	//user routers
+	//subscriber routers
 	txSubscribers := api.Group("/txsubscribe")
 	{
-		txSubscribers.Use(middleware.AuthMiddleware())
+		txSubscribers.Use(middleware.AuthMiddleware(), middleware.CORS())
 		txSubscribers.GET("/", s.GetAllTxSubscribe)
 		txSubscribers.PUT("/:id", s.UpdateTxSubscribe)
 		txSubscribers.GET("/:id", s.FindTxSubscribe)
