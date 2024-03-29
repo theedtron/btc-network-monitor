@@ -4,6 +4,8 @@ import (
 	"btc-network-monitor/internal/adapter/api/rpc"
 	mysql_repo "btc-network-monitor/internal/adapter/repositories/mysql"
 	"btc-network-monitor/internal/ports"
+	"fmt"
+	"github.com/btcsuite/btcd/btcjson"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/btcsuite/btcd/rpcclient"
 	"math"
@@ -85,24 +87,34 @@ func (m *MonitorService) GetTransactionByTransactionID(hash *chainhash.Hash) (in
 }
 
 func (m *MonitorService) GetLatestTransactions() (interface{}, error) {
-	transactionHash, err := m.client.GetRawMempool()
+	bestBlockHash, err := m.client.GetBestBlockHash()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error getting best block hash: %v", err)
 	}
 
-	var transactions []interface{}
-	for _, hash := range transactionHash {
+	block, err := m.client.GetBlockVerbose(bestBlockHash)
+	if err != nil {
+		return nil, fmt.Errorf("error getting block: %v", err)
+	}
+
+	var transactionHashes []*chainhash.Hash
+
+	for _, txid := range block.Tx {
+		txHash, err := chainhash.NewHashFromStr(txid)
+		if err != nil {
+			fmt.Printf("error parsing transaction hash %s: %v", txid, err)
+			continue
+		}
+		transactionHashes = append(transactionHashes, txHash)
+	}
+
+	var transactions []*btcjson.TxRawResult
+	for _, hash := range transactionHashes {
 		tx, err := m.client.GetRawTransactionVerbose(hash)
 		if err != nil {
 			return nil, err
 		}
 		transactions = append(transactions, tx)
-	}
-
-	if len(transactions) == 0 {
-		return map[string]interface{}{
-			"transactions": []interface{}{},
-		}, nil
 	}
 
 	return map[string]interface{}{
