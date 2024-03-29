@@ -72,11 +72,13 @@ func TxNotify(config mailer.NotificationConfig) {
 			//send email
 			senderEmailData := mailer.EmailData{
 				FirstName:     userModel.Firstname,
-				Subject:       "BTM Transaction Confirmation",
+				Subject:       "Sats-eye Transaction Confirmation",
 				MailTo:        userModel.Email,
 				Confirmations: confirms,
 				TxId:          sub.TxID,
 			}
+
+			config := mailer.NewNotificationConfig()
 			err = config.SendEmail(&senderEmailData)
 			if err != nil {
 				_, rollbackErr := subscriberRepo.Update(sub.ID, originalData)
